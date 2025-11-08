@@ -18,9 +18,22 @@
         "name": "next"
       }
     ],
+    "types": ["next", "node"],
     "paths": {
       "@/*": ["./src/*"]
-    }
+    },
+    "forceConsistentCasingInFileNames": true,
+    "noFallthroughCasesInSwitch": true,
+    "noImplicitReturns": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noUncheckedIndexedAccess": true,
+    "noPropertyAccessFromIndexSignature": true,
+    "allowUnusedLabels": false,
+    "allowUnreachableCode": false,
+    "exactOptionalPropertyTypes": false,
+    "noImplicitOverride": true,
+    "useUnknownInCatchVariables": true
   },
   "include": [
     "next-env.d.ts",

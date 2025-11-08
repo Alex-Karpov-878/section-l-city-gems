@@ -433,12 +433,14 @@
 
 
 ---
+
 title: Populate and Select
 description: Use Strapi's REST API to populate or select certain fields.
 sidebarDepth: 3
 sidebar_label: Populate & Select
 displayed_sidebar: cmsSidebar
 tags:
+
 - API
 - Content API
 - Combining operators
@@ -447,6 +449,7 @@ tags:
 - REST API
 - select
 - qs library
+
 ---
 
 import QsIntroFull from '/docs/snippets/qs-intro-full.md'
@@ -476,10 +479,10 @@ Queries can accept a `fields` parameter to select only some fields. By default, 
 - number types: integer, biginteger, float, and decimal,
 - generic types: boolean, array, and JSON.
 
-| Use case              | Example parameter syntax              |
-|-----------------------|---------------------------------------|
-| Select a single field | `fields=name`                         |
-| Select multiple fields| `fields[0]=name&fields[1]=description`|
+| Use case               | Example parameter syntax               |
+| ---------------------- | -------------------------------------- |
+| Select a single field  | `fields=name`                          |
+| Select multiple fields | `fields[0]=name&fields[1]=description` |
 
 :::note
 Field selection does not work on relational, media, component, or dynamic zone fields. To populate these fields, use the [`populate` parameter](#population).
@@ -496,14 +499,14 @@ Field selection does not work on relational, media, component, or dynamic zone f
 <QsForQueryBody />
 
 ```js
-const qs = require('qs');
+const qs = require("qs");
 const query = qs.stringify(
   {
-    fields: ['name', 'description'],
+    fields: ["name", "description"],
   },
   {
     encodeValuesOnly: true, // prettify URL
-  }
+  },
 );
 
 await request(`/api/users?${query}`);
@@ -532,7 +535,7 @@ await request(`/api/users?${query}`);
         }
       ],
       "documentId": "lr5wju2og49bf820kj9kz8c3"
-    },
+    }
     // …
   ],
   "meta": {
@@ -574,16 +577,16 @@ The [REST API guides](/cms/api/rest/guides/intro) section includes more detailed
 
 The following table sums up possible populate use cases and their associated parameter syntaxes, and links to sections of the Understanding populate guide which includes more detailed explanations:
 
-| Use case  | Example parameter syntax | Detailed explanations to read |
-|-----------| ---------------|-----------------------|
-| Populate everything, 1 level deep, including media fields, relations, components, and dynamic zones | `populate=*`| [Populate all relations and fields, 1 level deep](/cms/api/rest/guides/understanding-populate#populate-all-relations-and-fields-1-level-deep) |
-| Populate one relation,<br/>1 level deep | `populate=a-relation-name`| [Populate 1 level deep for specific relations](/cms/api/rest/guides/understanding-populate#populate-1-level-deep-for-specific-relations) |
-| Populate several relations,<br/>1 level deep | `populate[0]=relation-name&populate[1]=another-relation-name&populate[2]=yet-another-relation-name`| [Populate 1 level deep for specific relations](/cms/api/rest/guides/understanding-populate#populate-1-level-deep-for-specific-relations) |
-| Populate some relations, several levels deep | `populate[root-relation-name][populate][0]=nested-relation-name`| [Populate several levels deep for specific relations](/cms/api/rest/guides/understanding-populate#populate-several-levels-deep-for-specific-relations) |
-| Populate a component | `populate[0]=component-name`| [Populate components](/cms/api/rest/guides/understanding-populate#populate-components) |
-| Populate a component and one of its nested components | `populate[0]=component-name&populate[1]=component-name.nested-component-name`| [Populate components](/cms/api/rest/guides/understanding-populate#populate-components) |
-| Populate a dynamic zone (only its first-level elements) | `populate[0]=dynamic-zone-name`| [Populate dynamic zones](/cms/api/rest/guides/understanding-populate#populate-dynamic-zones) |
-| Populate a dynamic zone and its nested elements and relations, using a precisely defined, detailed population strategy | `populate[dynamic-zone-name][on][component-category.component-name][populate][relation-name][populate][0]=field-name`| [Populate dynamic zones](/cms/api/rest/guides/understanding-populate#populate-dynamic-zones) |
+| Use case                                                                                                               | Example parameter syntax                                                                                              | Detailed explanations to read                                                                                                                          |
+| ---------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Populate everything, 1 level deep, including media fields, relations, components, and dynamic zones                    | `populate=*`                                                                                                          | [Populate all relations and fields, 1 level deep](/cms/api/rest/guides/understanding-populate#populate-all-relations-and-fields-1-level-deep)          |
+| Populate one relation,<br/>1 level deep                                                                                | `populate=a-relation-name`                                                                                            | [Populate 1 level deep for specific relations](/cms/api/rest/guides/understanding-populate#populate-1-level-deep-for-specific-relations)               |
+| Populate several relations,<br/>1 level deep                                                                           | `populate[0]=relation-name&populate[1]=another-relation-name&populate[2]=yet-another-relation-name`                   | [Populate 1 level deep for specific relations](/cms/api/rest/guides/understanding-populate#populate-1-level-deep-for-specific-relations)               |
+| Populate some relations, several levels deep                                                                           | `populate[root-relation-name][populate][0]=nested-relation-name`                                                      | [Populate several levels deep for specific relations](/cms/api/rest/guides/understanding-populate#populate-several-levels-deep-for-specific-relations) |
+| Populate a component                                                                                                   | `populate[0]=component-name`                                                                                          | [Populate components](/cms/api/rest/guides/understanding-populate#populate-components)                                                                 |
+| Populate a component and one of its nested components                                                                  | `populate[0]=component-name&populate[1]=component-name.nested-component-name`                                         | [Populate components](/cms/api/rest/guides/understanding-populate#populate-components)                                                                 |
+| Populate a dynamic zone (only its first-level elements)                                                                | `populate[0]=dynamic-zone-name`                                                                                       | [Populate dynamic zones](/cms/api/rest/guides/understanding-populate#populate-dynamic-zones)                                                           |
+| Populate a dynamic zone and its nested elements and relations, using a precisely defined, detailed population strategy | `populate[dynamic-zone-name][on][component-category.component-name][populate][relation-name][populate][0]=field-name` | [Populate dynamic zones](/cms/api/rest/guides/understanding-populate#populate-dynamic-zones)                                                           |
 
 :::tip
 The easiest way to build complex queries with multiple-level population is to use our [interactive query builder](/cms/api/rest/interactive-query-builder) tool.
@@ -614,19 +617,19 @@ The population and pagination operators cannot be combined.
 <QsForQueryBody />
 
 ```js
-const qs = require('qs');
+const qs = require("qs");
 const query = qs.stringify(
   {
-    fields: ['title', 'slug'],
+    fields: ["title", "slug"],
     populate: {
       headerImage: {
-        fields: ['name', 'url'],
+        fields: ["name", "url"],
       },
     },
   },
   {
     encodeValuesOnly: true, // prettify URL
-  }
+  },
 );
 
 await request(`/api/articles?${query}`);
@@ -661,7 +664,6 @@ await request(`/api/articles?${query}`);
 </Response>
 </ApiCall>
 
-
 #### Populate with filtering
 
 `filters` and `populate` can be combined.
@@ -679,15 +681,15 @@ await request(`/api/articles?${query}`);
 <QsForQueryBody />
 
 ```js
-const qs = require('qs');
+const qs = require("qs");
 const query = qs.stringify(
   {
     populate: {
       categories: {
-        sort: ['name:asc'],
+        sort: ["name:asc"],
         filters: {
           name: {
-            $eq: 'Cars',
+            $eq: "Cars",
           },
         },
       },
@@ -695,7 +697,7 @@ const query = qs.stringify(
   },
   {
     encodeValuesOnly: true, // prettify URL
-  }
+  },
 );
 
 await request(`/api/articles?${query}`);
@@ -735,18 +737,19 @@ await request(`/api/articles?${query}`);
 </Response>
 </ApiCall>
 
-
-
 ---
+
 title: Interactive Query Builder
 description: Use an interactive tool that leverages the querystring library to build your query URL
 displayed_sidebar: cmsSidebar
 sidebar_label: Interactive Query Builder
 tags:
+
 - Content API
 - interactive query builder
 - REST API
 - qs library
+
 ---
 
 # Build your query URL with Strapi's interactive tool
@@ -767,9 +770,8 @@ Please refer to the [REST API parameters table](/cms/api/rest/parameters) and re
 <br />
 
 <InteractiveQueryBuilder
-  endpoint="/api/books"
-  code={`
-{
+endpoint="/api/books"
+code={`{
   sort: ['title:asc'],
   filters: {
     title: {
@@ -789,7 +791,7 @@ Please refer to the [REST API parameters table](/cms/api/rest/parameters) and re
   status: 'published',
   locale: ['en'],
 }
-  `}
+ `}
 />
 
 <br />
@@ -802,6 +804,7 @@ The default endpoint path is prefixed with `/api/` and should be kept as-is unle
 
 :::caution Disclaimer
 The `qs` library and the interactive query builder provided on this page:
+
 - might not detect all syntax errors,
 - are not aware of the parameters and values available in a Strapi project,
 - and do not provide autocomplete features.
@@ -809,14 +812,15 @@ The `qs` library and the interactive query builder provided on this page:
 Currently, these tools are only provided to transform the JavaScript object in an inline query string URL. Using the generated query URL does not guarantee that proper results will get returned with your API.
 :::
 
-
 ---
+
 title: Sort and Pagination
 description: Use Strapi's REST API to sort or paginate your data.
 sidebar_label: Sort & Pagination
 sidebarDepth: 3
 displayed_sidebar: cmsSidebar
 tags:
+
 - API
 - Content API
 - interactive query builder
@@ -826,6 +830,7 @@ tags:
 - REST API
 - sort
 - qs library
+
 ---
 
 import QsIntroFull from '/docs/snippets/qs-intro-full.md'
@@ -854,7 +859,6 @@ The sorting order can be defined with:
 - `:asc` for ascending order (default order, can be omitted)
 - or `:desc` for descending order.
 
-
 ### Example: Sort using 2 fields
 
 You can sort by multiple fields by passing fields in a `sort` array.
@@ -874,12 +878,15 @@ You can sort by multiple fields by passing fields in a `sort` array.
 <QsForQueryBody />
 
 ```js
-const qs = require('qs');
-const query = qs.stringify({
-  sort: ['Description', 'Name'],
-}, {
-  encodeValuesOnly: true, // prettify URL
-});
+const qs = require("qs");
+const query = qs.stringify(
+  {
+    sort: ["Description", "Name"],
+  },
+  {
+    encodeValuesOnly: true, // prettify URL
+  },
+);
 
 await request(`/api/restaurants?${query}`);
 ```
@@ -905,7 +912,7 @@ await request(`/api/restaurants?${query}`);
             }
           ]
         }
-      ],
+      ]
       // …
     },
     {
@@ -922,10 +929,10 @@ await request(`/api/restaurants?${query}`);
             }
           ]
         }
-      ],
+      ]
       // …
-    },
-   // …
+    }
+    // …
   ],
   "meta": {
     // …
@@ -938,7 +945,7 @@ await request(`/api/restaurants?${query}`);
 
 ### Example: Sort using 2 fields and set the order
 
-Using the `sort` parameter and defining `:asc` or  `:desc` on sorted fields, you can get results sorted in a particular order.
+Using the `sort` parameter and defining `:asc` or `:desc` on sorted fields, you can get results sorted in a particular order.
 
 <br />
 
@@ -955,12 +962,15 @@ Using the `sort` parameter and defining `:asc` or  `:desc` on sorted fields, you
 <QsForQueryBody />
 
 ```js
-const qs = require('qs');
-const query = qs.stringify({
-  sort: ['Description:asc', 'Name:desc'],
-}, {
-  encodeValuesOnly: true, // prettify URL
-});
+const qs = require("qs");
+const query = qs.stringify(
+  {
+    sort: ["Description:asc", "Name:desc"],
+  },
+  {
+    encodeValuesOnly: true, // prettify URL
+  },
+);
 
 await request(`/api/restaurants?${query}`);
 ```
@@ -986,7 +996,7 @@ await request(`/api/restaurants?${query}`);
             }
           ]
         }
-      ],
+      ]
       // …
     },
     {
@@ -1003,9 +1013,9 @@ await request(`/api/restaurants?${query}`);
             }
           ]
         }
-      ],
+      ]
       // …
-    },
+    }
     // …
   ],
   "meta": {
@@ -1052,15 +1062,18 @@ To paginate results by page, use the following parameters:
 <QsForQueryBody />
 
 ```js
-const qs = require('qs');
-const query = qs.stringify({
-  pagination: {
-    page: 1,
-    pageSize: 10,
+const qs = require("qs");
+const query = qs.stringify(
+  {
+    pagination: {
+      page: 1,
+      pageSize: 10,
+    },
   },
-}, {
-  encodeValuesOnly: true, // prettify URL
-});
+  {
+    encodeValuesOnly: true, // prettify URL
+  },
+);
 
 await request(`/api/articles?${query}`);
 ```
@@ -1094,7 +1107,7 @@ To paginate results by offset, use the following parameters:
 
 | Parameter               | Type    | Description                                                    | Default |
 | ----------------------- | ------- | -------------------------------------------------------------- | ------- |
-| `pagination[start]`     | Integer | Start value (i.e. first entry to return)                      | 0       |
+| `pagination[start]`     | Integer | Start value (i.e. first entry to return)                       | 0       |
 | `pagination[limit]`     | Integer | Number of entries to return                                    | 25      |
 | `pagination[withCount]` | Boolean | Toggles displaying the total number of entries to the response | `true`  |
 
@@ -1115,15 +1128,18 @@ The default and maximum values for `pagination[limit]` can be [configured in the
 <QsForQueryBody />
 
 ```js
-const qs = require('qs');
-const query = qs.stringify({
-  pagination: {
-    start: 0,
-    limit: 10,
+const qs = require("qs");
+const query = qs.stringify(
+  {
+    pagination: {
+      start: 0,
+      limit: 10,
+    },
   },
-}, {
-  encodeValuesOnly: true, // prettify URL
-});
+  {
+    encodeValuesOnly: true, // prettify URL
+  },
+);
 
 await request(`/api/articles?${query}`);
 ```
