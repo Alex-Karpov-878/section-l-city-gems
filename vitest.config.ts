@@ -5,7 +5,7 @@ import path from "path";
 export default defineConfig({
   plugins: [react()],
   test: {
-    environment: "node",
+    environment: "jsdom",
     globals: true,
     exclude: [
       "**/node_modules/**",
@@ -14,6 +14,9 @@ export default defineConfig({
       "**/{karma,rollup,webpack,vite,vitest,jest,ava,babel,nyc,cypress,tsup,build}.config.*",
       ".trunk/**",
       ".next/**",
+      "e2e/**",
+      "**/e2e/**",
+      "**/*.spec.ts",
     ],
     coverage: {
       provider: "v8",
@@ -27,6 +30,7 @@ export default defineConfig({
         ".trunk/",
       ],
     },
+    setupFiles: "./src/lib/test/setup.ts",
   },
   resolve: {
     alias: {
