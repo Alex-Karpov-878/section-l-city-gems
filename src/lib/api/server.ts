@@ -1,52 +1,54 @@
 import "server-only";
-
 import { Property, CityGem, ApiResponse } from "@/types/api";
+import { createLogger } from "@/lib/logger";
 
 const EXTERNAL_API_URL =
   process.env.SERVER_API_URL || "https://content.section-l.co/api";
 const API_TOKEN = process.env.STRAPI_API_TOKEN;
 
-async function fetchFromApi<T extends ApiResponse<unknown>>(
+const logger = createLogger("ServerAPI");
+
+async function fetchFromApi<T extends { data: any[]; meta: any }>(
   path: string,
-  urlParams: URLSearchParams,
+  urlParams: URLSearchParams
 ): Promise<T> {
   const url = `${EXTERNAL_API_URL}${path}?${urlParams.toString()}`;
   const headers: HeadersInit = {
     "Content-Type": "application/json",
   };
-
   if (API_TOKEN) {
     headers["Authorization"] = `Bearer ${API_TOKEN}`;
   }
 
-  console.log(`[SERVER_API_REQUEST] Fetching data...`, {
+  logger.debug("Fetching from Strapi", {
     url,
     method: "GET",
-    headers: {
-      Authorization: API_TOKEN ? "Bearer [REDACTED]" : "None",
-    },
+    hasAuth: !!API_TOKEN,
   });
 
   try {
     const response = await fetch(url, {
       headers,
-      next: { revalidate: 3600 }, // Revalidate cache every hour
+      next: { revalidate: 3600 },
     });
 
     if (!response.ok) {
       const errorBody = await response.text();
-      console.error(
-        `[SERVER_API_ERROR] Failed to fetch ${url}: ${response.status} ${response.statusText}`,
-        { errorBody },
+      const error = new Error(
+        `Failed to fetch data from the external API. Status: ${response.status}`
       );
-      throw new Error(
-        `External API request failed with status: ${response.status} ${response.statusText}`,
+      logger.error(
+        `Failed to fetch from Strapi: ${response.status} ${response.statusText}`,
+        error,
+        { url, status: response.status, errorBody }
       );
+      throw error;
     }
 
     const jsonResponse = (await response.json()) as T;
 
-    console.log(`[SERVER_API_RESPONSE] Received data for ${path}`, {
+    logger.debug("Received Strapi data", {
+      path,
       page: jsonResponse.meta.pagination?.page || 1,
       itemsReceived: jsonResponse.data.length,
       totalItems: jsonResponse.meta.pagination?.total,
@@ -54,34 +56,35 @@ async function fetchFromApi<T extends ApiResponse<unknown>>(
 
     return jsonResponse;
   } catch (error) {
-    const errorMessage =
-      error instanceof Error ? error.message : "An unknown error occurred";
-    console.error(
-      `[SERVER_API_ERROR] Network or parsing error fetching ${url}:`,
-      errorMessage,
-      error,
-    );
-    throw new Error(
-      `A network error occurred while fetching data from ${path}: ${errorMessage}`,
-    );
+    if (
+      error instanceof Error &&
+      error.message.includes("Failed to fetch data")
+    ) {
+      throw error; // Re-throw our custom error
+    }
+    logger.error("Network error fetching from Strapi", error, { url });
+    throw new Error("A network error occurred while fetching data.");
   }
 }
 
 async function fetchAllPages<T>(
   path: string,
-  initialParams: URLSearchParams,
+  initialParams: URLSearchParams
 ): Promise<T[]> {
+  // Fetch the first page to get pagination metadata
   const firstPageResponse = await fetchFromApi<ApiResponse<T>>(
     path,
-    initialParams,
+    initialParams
   );
   let allData = firstPageResponse.data;
   const pagination = firstPageResponse.meta.pagination;
 
+  // If there's only one page, we're done
   if (pagination.pageCount <= 1) {
     return allData;
   }
 
+  // Create an array of promises for the remaining pages
   const pagePromises: Promise<ApiResponse<T>>[] = [];
   for (let page = 2; page <= pagination.pageCount; page++) {
     const pageParams = new URLSearchParams(initialParams);
@@ -95,9 +98,11 @@ async function fetchAllPages<T>(
     allData = allData.concat(pageResponse.data);
   });
 
-  console.log(
-    `[SERVER_API_AGGREGATE] Finished fetching all ${pagination.pageCount} pages for ${path}. Total items: ${allData.length}`,
-  );
+  logger.info("Finished fetching all pages from Strapi", {
+    path,
+    pageCount: pagination.pageCount,
+    totalItems: allData.length,
+  });
 
   return allData;
 }
@@ -122,7 +127,7 @@ export const serverApi = {
       "populate[neighborhoods][populate][city_gems][populate][tags]": "true",
       "populate[neighborhoods][populate][vibes]": "true",
       "populate[map_pin]": "true",
-      // "populate[property_type]": "true",
+      "populate[property_type]": "true",
       // "populate[room_types]": "true",
       // "populate[offers]": "true",
       // "populate[access_points]": "true",
@@ -133,7 +138,7 @@ export const serverApi = {
 
     const response = await fetchFromApi<ApiResponse<Property>>(
       "/properties",
-      params,
+      params
     );
     return response.data[0] || null;
   },
@@ -149,18 +154,11 @@ export const serverApi = {
   },
 
   getGemsByIds: async (ids: number[]): Promise<CityGem[]> => {
-    if (ids.length === 0) {
-      return [];
-    }
+    if (ids.length === 0) return [];
     const params = new URLSearchParams();
     ids.forEach((id) => params.append("filters[id][$in]", id.toString()));
     params.append("populate", "*");
 
-    // Assuming IDs will fit in a single page for simplicity
-    const response = await fetchFromApi<ApiResponse<CityGem>>(
-      "/city-gems",
-      params,
-    );
-    return response.data;
+    return fetchAllPages<CityGem>("/city-gems", params);
   },
 };
