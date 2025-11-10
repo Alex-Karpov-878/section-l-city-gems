@@ -1,0 +1,17 @@
+# Ignore artifacts
+.next/
+build/
+out/
+coverage/
+storybook-static/
+
+# Ignore lockfiles
+package-lock.json
+pnpm-lock.yaml
+yarn.lock
+
+# Ignore node modules
+node_modules/
+
+# Ignore environment files
+.env*.local
