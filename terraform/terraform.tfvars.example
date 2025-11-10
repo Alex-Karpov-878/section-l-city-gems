@@ -1,0 +1,27 @@
+# Terraform Variables Configuration Example
+# Copy this file to terraform.tfvars and fill in your actual values
+# DO NOT commit terraform.tfvars to version control
+
+# Required: Vercel API Token
+# Get from: https://vercel.com/account/tokens
+vercel_api_token = "your-vercel-api-token-here"
+
+# Required: GitHub Repository
+# Format: "owner/repo-name"
+github_repo = "Section-L/section-l-city-gems"
+
+# Optional: Vercel Team ID (for team accounts)
+# Get from: Vercel dashboard > Settings > General
+# vercel_team_id = "team_xxxxxxxxxxxxx"
+
+# Optional: Strapi API Configuration
+strapi_api_url = "https://content.section-l.co/api"
+
+# Optional: Strapi API Token (for authenticated endpoints)
+# Leave empty if not using authentication
+# strapi_api_token = "your-strapi-bearer-token-here"
+
+# Optional: Project Configuration
+project_name = "section-l-city-gems"
+production_branch = "main"
+environment = "production"
