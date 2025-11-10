@@ -22,10 +22,10 @@ interface LoggerConfig {
 
 const getDefaultConfig = (): LoggerConfig => ({
   minLevel:
-    process.env.NODE_ENV === "production" ? LogLevel.INFO : LogLevel.DEBUG,
+    process.env.NODE_ENV === 'production' ? LogLevel.INFO : LogLevel.DEBUG,
   enableConsole: true,
   enableTimestamps: true,
-  prettyPrint: process.env.NODE_ENV === "development",
+  prettyPrint: process.env.NODE_ENV === 'development',
 });
 
 let globalConfig: LoggerConfig = getDefaultConfig();
@@ -39,21 +39,21 @@ export function resetLoggerConfig(): void {
 }
 
 const LOG_LEVEL_NAMES: Record<LogLevel, string> = {
-  [LogLevel.DEBUG]: "DEBUG",
-  [LogLevel.INFO]: "INFO",
-  [LogLevel.WARN]: "WARN",
-  [LogLevel.ERROR]: "ERROR",
-  [LogLevel.NONE]: "NONE",
+  [LogLevel.DEBUG]: 'DEBUG',
+  [LogLevel.INFO]: 'INFO',
+  [LogLevel.WARN]: 'WARN',
+  [LogLevel.ERROR]: 'ERROR',
+  [LogLevel.NONE]: 'NONE',
 };
 
-const LOG_COLORS = {
-  [LogLevel.DEBUG]: "\x1b[36m", // Cyan
-  [LogLevel.INFO]: "\x1b[32m", // Green
-  [LogLevel.WARN]: "\x1b[33m", // Yellow
-  [LogLevel.ERROR]: "\x1b[31m", // Red
-  reset: "\x1b[0m",
-  gray: "\x1b[90m",
-  bold: "\x1b[1m",
+const LOG_COLORS: Record<string, string> = {
+  [LogLevel.DEBUG]: '\x1b[36m', // Cyan
+  [LogLevel.INFO]: '\x1b[32m', // Green
+  [LogLevel.WARN]: '\x1b[33m', // Yellow
+  [LogLevel.ERROR]: '\x1b[31m', // Red
+  reset: '\x1b[0m',
+  gray: '\x1b[90m',
+  bold: '\x1b[1m',
 };
 
 function formatLogEntry(entry: LogEntry): string {
@@ -70,10 +70,10 @@ function formatLogEntry(entry: LogEntry): string {
     });
   }
 
-  const color = LOG_COLORS[level];
-  const reset = LOG_COLORS.reset;
-  const gray = LOG_COLORS.gray;
-  const bold = LOG_COLORS.bold;
+  const color = LOG_COLORS[String(level)] || LOG_COLORS['reset'];
+  const reset = LOG_COLORS['reset'];
+  const gray = LOG_COLORS['gray'];
+  const bold = LOG_COLORS['bold'];
 
   const parts: string[] = [];
 
@@ -85,7 +85,7 @@ function formatLogEntry(entry: LogEntry): string {
   parts.push(`${gray}[${namespace}]${reset}`);
   parts.push(message);
 
-  let output = parts.join(" ");
+  let output = parts.join(' ');
 
   if (metadata && Object.keys(metadata).length > 0) {
     output += `\n${gray}${JSON.stringify(metadata, null, 2)}${reset}`;
@@ -135,7 +135,7 @@ export class Logger {
     level: LogLevel,
     message: string,
     metadata?: Record<string, unknown>,
-    error?: Error
+    error?: Error,
   ): LogEntry {
     return {
       level,
@@ -151,7 +151,7 @@ export class Logger {
     level: LogLevel,
     message: string,
     metadata?: Record<string, unknown>,
-    error?: Error
+    error?: Error,
   ): void {
     if (!this.shouldLog(level)) {
       return;
@@ -178,19 +178,21 @@ export class Logger {
   error(
     message: string,
     error?: Error | unknown,
-    metadata?: Record<string, unknown>
+    metadata?: Record<string, unknown>,
   ): void {
     const errorObj = error instanceof Error ? error : undefined;
-    const combinedMetadata = {
-      ...metadata,
-      ...(error && !(error instanceof Error) && { errorDetails: error }),
+    const combinedMetadata: Record<string, unknown> = {
+      ...(metadata || {}),
     };
+    if (error && !(error instanceof Error)) {
+      combinedMetadata['errorDetails'] = error;
+    }
 
     this.log(
       LogLevel.ERROR,
       message,
       Object.keys(combinedMetadata).length > 0 ? combinedMetadata : undefined,
-      errorObj
+      errorObj,
     );
   }
 
@@ -201,9 +203,9 @@ export class Logger {
   apiRequest(
     method: string,
     url: string,
-    params?: Record<string, unknown>
+    params?: Record<string, unknown>,
   ): void {
-    this.debug("API Request", {
+    this.debug('API Request', {
       method: method.toUpperCase(),
       url,
       ...(params && { params }),
@@ -211,15 +213,15 @@ export class Logger {
   }
 
   apiResponse(status: number, url: string, data?: unknown): void {
-    this.debug("API Response", {
-      status,
-      url,
-      ...(data && { dataKeys: Object.keys(data as Record<string, unknown>) }),
-    });
+    const responseMeta: Record<string, unknown> = { status, url };
+    if (data) {
+      responseMeta['dataKeys'] = Object.keys(data as Record<string, unknown>);
+    }
+    this.debug('API Response', responseMeta);
   }
 
   apiError(url: string, error: Error | unknown): void {
-    this.error("API Error", error, { url });
+    this.error('API Error', error, { url });
   }
 
   async time<T>(label: string, fn: () => Promise<T>): Promise<T> {
@@ -243,9 +245,9 @@ export function createLogger(namespace: string): Logger {
   return new Logger(namespace);
 }
 
-export const logger = createLogger("App");
+export const logger = createLogger('App');
 
-export const apiLogger = createLogger("API");
-export const storeLogger = createLogger("Store");
-export const hookLogger = createLogger("Hook");
-export const componentLogger = createLogger("Component");
+export const apiLogger = createLogger('API');
+export const storeLogger = createLogger('Store');
+export const hookLogger = createLogger('Hook');
+export const componentLogger = createLogger('Component');

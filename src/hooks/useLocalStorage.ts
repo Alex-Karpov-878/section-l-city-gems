@@ -4,7 +4,7 @@ import {
   useCallback,
   Dispatch,
   SetStateAction,
-} from "react";
+} from 'react';
 
 type SetValue<T> = Dispatch<SetStateAction<T>>;
 
@@ -15,12 +15,12 @@ interface UseLocalStorageOptions {
 export function useLocalStorage<T>(
   key: string,
   initialValue: T,
-  options: UseLocalStorageOptions = {}
+  options: UseLocalStorageOptions = {},
 ): [T, SetValue<T>, () => void] {
   const { syncAcrossTabs = true } = options;
 
   const [storedValue, setStoredValue] = useState<T>(() => {
-    if (typeof window === "undefined") {
+    if (typeof window === 'undefined') {
       return initialValue;
     }
 
@@ -41,14 +41,14 @@ export function useLocalStorage<T>(
 
         setStoredValue(valueToStore);
 
-        if (typeof window !== "undefined") {
+        if (typeof window !== 'undefined') {
           window.localStorage.setItem(key, JSON.stringify(valueToStore));
 
           if (syncAcrossTabs) {
             window.dispatchEvent(
-              new CustomEvent("local-storage-change", {
+              new CustomEvent('local-storage-change', {
                 detail: { key, value: valueToStore },
-              })
+              }),
             );
           }
         }
@@ -56,20 +56,20 @@ export function useLocalStorage<T>(
         console.error(`Error setting localStorage key "${key}":`, error);
       }
     },
-    [key, storedValue, syncAcrossTabs]
+    [key, storedValue, syncAcrossTabs],
   );
 
   const removeValue = useCallback(() => {
     try {
       setStoredValue(initialValue);
-      if (typeof window !== "undefined") {
+      if (typeof window !== 'undefined') {
         window.localStorage.removeItem(key);
 
         if (syncAcrossTabs) {
           window.dispatchEvent(
-            new CustomEvent("local-storage-change", {
+            new CustomEvent('local-storage-change', {
               detail: { key, value: null },
-            })
+            }),
           );
         }
       }
@@ -79,7 +79,7 @@ export function useLocalStorage<T>(
   }, [key, initialValue, syncAcrossTabs]);
 
   useEffect(() => {
-    if (!syncAcrossTabs || typeof window === "undefined") {
+    if (!syncAcrossTabs || typeof window === 'undefined') {
       return;
     }
 
@@ -91,7 +91,7 @@ export function useLocalStorage<T>(
           } catch (error) {
             console.error(
               `Error parsing localStorage value for key "${key}":`,
-              error
+              error,
             );
           }
         }
@@ -108,20 +108,20 @@ export function useLocalStorage<T>(
       }
     };
 
-    window.addEventListener("storage", handleStorageChange as EventListener);
+    window.addEventListener('storage', handleStorageChange as EventListener);
     window.addEventListener(
-      "local-storage-change",
-      handleStorageChange as EventListener
+      'local-storage-change',
+      handleStorageChange as EventListener,
     );
 
     return () => {
       window.removeEventListener(
-        "storage",
-        handleStorageChange as EventListener
+        'storage',
+        handleStorageChange as EventListener,
       );
       window.removeEventListener(
-        "local-storage-change",
-        handleStorageChange as EventListener
+        'local-storage-change',
+        handleStorageChange as EventListener,
       );
     };
   }, [key, initialValue, syncAcrossTabs]);
@@ -129,21 +129,23 @@ export function useLocalStorage<T>(
   return [storedValue, setValue, removeValue];
 }
 
-/**
- * Hook to check if localStorage is available
- */
 export function useIsLocalStorageAvailable(): boolean {
   const [isAvailable, setIsAvailable] = useState(false);
 
   useEffect(() => {
-    try {
-      const testKey = "__localStorage_test__";
-      window.localStorage.setItem(testKey, "test");
-      window.localStorage.removeItem(testKey);
-      setIsAvailable(true);
-    } catch {
-      setIsAvailable(false);
-    }
+    // Defer the state update to avoid synchronous setState in effect
+    const timer = setTimeout(() => {
+      try {
+        const testKey = '__localStorage_test__';
+        window.localStorage.setItem(testKey, 'test');
+        window.localStorage.removeItem(testKey);
+        setIsAvailable(true);
+      } catch {
+        setIsAvailable(false);
+      }
+    }, 0);
+
+    return () => clearTimeout(timer);
   }, []);
 
   return isAvailable;

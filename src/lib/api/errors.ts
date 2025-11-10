@@ -1,12 +1,12 @@
 export enum ErrorType {
-  NETWORK = "NETWORK_ERROR",
-  TIMEOUT = "TIMEOUT_ERROR",
-  NOT_FOUND = "NOT_FOUND",
-  UNAUTHORIZED = "UNAUTHORIZED",
-  FORBIDDEN = "FORBIDDEN",
-  VALIDATION = "VALIDATION_ERROR",
-  SERVER = "SERVER_ERROR",
-  UNKNOWN = "UNKNOWN_ERROR",
+  NETWORK = 'NETWORK_ERROR',
+  TIMEOUT = 'TIMEOUT_ERROR',
+  NOT_FOUND = 'NOT_FOUND',
+  UNAUTHORIZED = 'UNAUTHORIZED',
+  FORBIDDEN = 'FORBIDDEN',
+  VALIDATION = 'VALIDATION_ERROR',
+  SERVER = 'SERVER_ERROR',
+  UNKNOWN = 'UNKNOWN_ERROR',
 }
 
 export interface ErrorDetails {
@@ -27,10 +27,10 @@ export class ApiError extends Error {
     type: ErrorType = ErrorType.UNKNOWN,
     statusCode?: number,
     details?: ErrorDetails,
-    endpoint?: string
+    endpoint?: string,
   ) {
     super(message);
-    this.name = "ApiError";
+    this.name = 'ApiError';
     this.type = type;
     this.statusCode = statusCode;
     this.details = details;
@@ -45,23 +45,25 @@ export class ApiError extends Error {
   public getUserMessage(): string {
     switch (this.type) {
       case ErrorType.NETWORK:
-        return "Network connection error. Please check your internet connection.";
+        return 'Network connection error. Please check your internet connection.';
       case ErrorType.TIMEOUT:
-        return "Request timed out. Please try again.";
+        return 'Request timed out. Please try again.';
       case ErrorType.NOT_FOUND:
-        return "The requested resource was not found.";
+        return 'The requested resource was not found.';
       case ErrorType.UNAUTHORIZED:
-        return "You are not authorized to access this resource.";
+        return 'You are not authorized to access this resource.';
       case ErrorType.FORBIDDEN:
-        return "Access to this resource is forbidden.";
+        return 'Access to this resource is forbidden.';
       case ErrorType.VALIDATION:
         return (
-          (this.details?.details?.message as string) || "Invalid request data."
+          ((this.details?.details as Record<string, unknown> | undefined)?.[
+            'message'
+          ] as string) || 'Invalid request data.'
         );
       case ErrorType.SERVER:
-        return "Server error. Please try again later.";
+        return 'Server error. Please try again later.';
       default:
-        return "An unexpected error occurred. Please try again.";
+        return 'An unexpected error occurred. Please try again.';
     }
   }
 
@@ -81,27 +83,27 @@ export class ApiError extends Error {
 export class NetworkError extends ApiError {
   constructor(message: string, endpoint?: string, details?: ErrorDetails) {
     super(message, ErrorType.NETWORK, undefined, details, endpoint);
-    this.name = "NetworkError";
+    this.name = 'NetworkError';
   }
 }
 
 export class TimeoutError extends ApiError {
   constructor(message: string, endpoint?: string, details?: ErrorDetails) {
     super(message, ErrorType.TIMEOUT, 408, details, endpoint);
-    this.name = "TimeoutError";
+    this.name = 'TimeoutError';
   }
 }
 export class NotFoundError extends ApiError {
   constructor(message: string, endpoint?: string, details?: ErrorDetails) {
     super(message, ErrorType.NOT_FOUND, 404, details, endpoint);
-    this.name = "NotFoundError";
+    this.name = 'NotFoundError';
   }
 }
 
 export class ValidationError extends ApiError {
   constructor(message: string, endpoint?: string, details?: ErrorDetails) {
     super(message, ErrorType.VALIDATION, 400, details, endpoint);
-    this.name = "ValidationError";
+    this.name = 'ValidationError';
   }
 }
 export class ServerError extends ApiError {
@@ -109,23 +111,23 @@ export class ServerError extends ApiError {
     message: string,
     statusCode: number = 500,
     endpoint?: string,
-    details?: ErrorDetails
+    details?: ErrorDetails,
   ) {
     super(message, ErrorType.SERVER, statusCode, details, endpoint);
-    this.name = "ServerError";
+    this.name = 'ServerError';
   }
 }
 
 export class UnauthorizedError extends ApiError {
   constructor(message: string, endpoint?: string, details?: ErrorDetails) {
     super(message, ErrorType.UNAUTHORIZED, 401, details, endpoint);
-    this.name = "UnauthorizedError";
+    this.name = 'UnauthorizedError';
   }
 }
 export class ForbiddenError extends ApiError {
   constructor(message: string, endpoint?: string, details?: ErrorDetails) {
     super(message, ErrorType.FORBIDDEN, 403, details, endpoint);
-    this.name = "ForbiddenError";
+    this.name = 'ForbiddenError';
   }
 }
 
@@ -133,7 +135,7 @@ export function createErrorFromResponse(
   statusCode: number,
   message: string,
   endpoint?: string,
-  details?: ErrorDetails
+  details?: ErrorDetails,
 ): ApiError {
   switch (statusCode) {
     case 400:
@@ -155,7 +157,7 @@ export function createErrorFromResponse(
         ErrorType.UNKNOWN,
         statusCode,
         details,
-        endpoint
+        endpoint,
       );
   }
 }
