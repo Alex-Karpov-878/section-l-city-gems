@@ -1,14 +1,4 @@
-// Base interface for common Strapi entity fields to keep types DRY.
-interface StrapiEntity {
-  id: number;
-  documentId: string;
-  createdAt: string;
-  updatedAt: string;
-  publishedAt: string;
-  locale: string;
-  localizations: unknown[];
-}
-
+// Wrapper for API list responses
 export interface ApiResponse<T> {
   data: T[];
   meta: {
@@ -21,20 +11,20 @@ export interface ApiResponse<T> {
   };
 }
 
-export interface OneDayItinerary extends StrapiEntity {
-  description: string | null;
-  mapColorHex: string;
-  personaName: string | null;
-}
-
-export interface Property extends StrapiEntity {
+// Core Entities
+export interface Property {
+  id: number;
+  documentId: string;
   name: string;
   acronym: string;
+  createdAt: string;
+  updatedAt: string;
+  publishedAt: string;
+  locale: string;
   bookingPage: string;
   slug: string;
   description: string | null;
   lobbyWifiSSID: string | null;
-  artist_depracated?: unknown | null;
   neighborhoods: Neighborhood[];
   map_pin: MapPin | null;
   offers: Offer[];
@@ -46,10 +36,16 @@ export interface Property extends StrapiEntity {
   happy_hours: HappyHour[];
 }
 
-export interface Neighborhood extends StrapiEntity {
+export interface Neighborhood {
+  id: number;
+  documentId: string;
   name: string;
   hashtagOne: string;
   description: string | null;
+  createdAt: string;
+  updatedAt: string;
+  publishedAt: string;
+  locale: string;
   hashtagTwo: string | null;
   slug: string;
   hashtagOneDescription: string | null;
@@ -59,7 +55,6 @@ export interface Neighborhood extends StrapiEntity {
   city: City | null;
   map_pin: MapPin | null;
   offers: Offer[];
-  one_day_itinerary: OneDayItinerary | null;
   tags: Tag[];
   vibes: Vibe[];
   cardImage: UploadFile | null;
@@ -68,68 +63,70 @@ export interface Neighborhood extends StrapiEntity {
   hashtagTwoIcon: UploadFile | null;
 }
 
-export interface CityGem extends StrapiEntity {
+export interface CityGem {
+  id: number;
+  documentId: string;
   name: string;
   category: Category;
   shortDescription: string;
   longDescription: string;
   googleMapsUrl: string;
   tip: string | null;
+  createdAt: string;
+  updatedAt: string;
+  publishedAt: string;
+  locale: string;
   slug: string;
-  substatus: "WIP" | null;
+  substatus: 'WIP' | null;
   coverImage: UploadFile;
-  icon: UploadFile | null;
   neighborhoods: Partial<Neighborhood>[];
   tags: Tag[];
 }
 
+// Relational & Nested Entities
 export interface MapPin {
   id: number;
-  documentId: string;
   name: string;
-  type: "property" | "neighborhood";
+  type: 'property' | 'neighborhood';
   lat: number;
   lng: number;
   geohash: string;
-  map?: {
-    lat: number;
-    lng: number;
-  };
 }
 
-export interface Offer extends StrapiEntity {
+export interface Offer {
+  id: number;
   name: string;
   shortDescription: string;
   claimOfferUrl: string;
   slug: string;
 }
 
-export interface RoomType extends StrapiEntity {
+export interface RoomType {
+  id: number;
   name: string;
   roomCleaningFee: number;
   floorArea: string;
   description: string;
-  bookingEngineRoomId: string | null;
 }
 
 export interface PropertyType {
   id: number;
-  documentId: string;
-  name: "Residences" | "Apart-Hotels";
+  name: 'Residences' | 'Apart-Hotels';
   carouselSectionHeaderTitle: string;
   carouselSectionHeaderDescription: string;
 }
 
-export interface AccessPoint extends StrapiEntity {
+export interface AccessPoint {
+  id: number;
   name: string;
-  description: string | null;
+  description: string;
   isTrainStation: boolean | null;
   isAirport: boolean | null;
 }
 
-export interface Artwork extends StrapiEntity {
+export interface Artwork {
+  id: number;
   name: string;
-  description: string | null;
 }
 
 export interface HappyHour {
@@ -137,51 +134,51 @@ export interface HappyHour {
   startTime: string;
   endTime: string;
   dayOfWeek:
-    | "Monday"
-    | "Tuesday"
-    | "Wednesday"
-    | "Thursday"
-    | "Friday"
-    | "Saturday"
-    | "Sunday";
+    | 'Monday'
+    | 'Tuesday'
+    | 'Wednesday'
+    | 'Thursday'
+    | 'Friday'
+    | 'Saturday'
+    | 'Sunday';
 }
 
-export interface Tag extends StrapiEntity {
+export interface Tag {
+  id: number;
   name: string;
-  type: string | null;
 }
 
-export interface Vibe extends StrapiEntity {
-  name: string;
-  slug: string;
-}
-
-export interface City extends StrapiEntity {
+export interface Vibe {
+  id: number;
   name: string;
   slug: string;
 }
 
-export interface UploadFile extends StrapiEntity {
+export interface City {
+  id: number;
+  name: string;
+  slug: string;
+}
+
+// Utility & Media Types
+export interface UploadFile {
+  id: number;
   name: string;
   alternativeText: string | null;
   caption: string | null;
-  width: number | null;
-  height: number | null;
+  width: number;
+  height: number;
   formats: {
     large?: FileFormat;
     small?: FileFormat;
     medium?: FileFormat;
     thumbnail?: FileFormat;
-  } | null;
+  };
   hash: string;
   ext: string;
   mime: string;
   size: number;
   url: string;
-  previewUrl: string | null;
-  provider: string;
-  provider_metadata: Record<string, unknown> | null;
-  isUrlSigned: boolean;
 }
 
 export interface FileFormat {
@@ -190,12 +187,10 @@ export interface FileFormat {
   hash: string;
   mime: string;
   name: string;
-  path: string | null;
   size: number;
   width: number;
   height: number;
-  sizeInBytes: number;
-  isUrlSigned?: boolean;
 }
 
-export type Category = "Food & Drink" | "Shopping" | "Culture";
+// App-specific literal type
+export type Category = 'Food & Drink' | 'Shopping' | 'Culture';
